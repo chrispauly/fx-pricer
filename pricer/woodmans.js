@@ -5,10 +5,13 @@ const woodmans = {
 		console.log(`Navigating to ${this.baseUrl}...`);
 
         await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0');
-        await page.goto(`${this.baseUrl}`, { waitUntil: 'networkidle2' });  //networkidle0 || domcontentloaded
+        await page.goto(`${this.baseUrl}`, { waitUntil: 'networkidle0' });  //networkidle0 || domcontentloaded
          
+        console.log("Woodman's loaded");
         await page.waitForSelector('input', { timeout: 10000 });
+        console.log("Found input");
         await page.type('input', zip);
+        console.log(`Entered ${zip}`);
         await page.keyboard.press('Enter');
         await page.waitForNavigation();
 
@@ -24,33 +27,38 @@ const woodmans = {
         await page.keyboard.press('Enter');
 
         await page.waitForSelector('div[aria-label="Product"]', { timeout: 10000 });
-        
-// if fp-result-list does not return, means no results for search term
+        //await page.waitForSelector('xpath///button/span[text() = "Load more"]');
+
+        await new Promise(r => setTimeout(r, 2000));
 
         const products = await page.evaluate((prodElements) => {
             prodElements = [];
         
             document.querySelectorAll('div[aria-label="Product"]').forEach(item => {
                 const productNameElement = item.querySelector('a > div > div > h2');
-                //const productPriceElement = item.querySelector('div.fp-item-detail > div.fp-item-price > span.fp-item-base-price');
-                //const productSaleElement = item.querySelector('div.fp-item-detail > div.fp-item-sale > span.fp-item-sale-date');
+                const productPriceElement = item.querySelector('div.e-1jioxed > span');
+                const productSalePriceElement = item.querySelector('div.e-hlbpyw > span');
+                const productOriginalPriceElement = item.querySelector('div.e-1rr4qq7 > span');
+                const productDealElement = item.querySelector('div.e-81yhrs');
                 //const productImgElement = item.querySelector('div.fp-item-image > a > img');
+                const productSizeElement = item.querySelector('div.e-122cwne'); //item.querySelector('a > div > div > div[title]');
 
-                if (productNameElement) {
+                if (productNameElement && (productPriceElement || productSalePriceElement)) {
                     const productName = productNameElement.textContent.trim();
-                    const productPrice = null; //productPriceElement.innerText.trim();
-                    const productSale = null; //productSaleElement ? productSaleElement.innerText.trim().replace('Sale price:\n','') : null;
-                    
-                    // // try to get UPC
-                    // let imgSrc = productImgElement ? productImgElement.src.trim() : '';
-                    // let upcMatch = imgSrc.match(/images\.freshop\.com\/(\d+)/);
-                    // const productUpc = upcMatch ? upcMatch[1] : null;
-                    
+                    const productPrice = (productPriceElement || productSalePriceElement) ? 
+                                         (productPriceElement || productSalePriceElement).innerText.trim() : null;
+                    const productSale = (productSalePriceElement || productDealElement) ?
+                                        (productSalePriceElement || productDealElement).innerText.trim() : null;
+                    const productSize = productSizeElement ? productSizeElement.title.trim() : null;
+                    //const imgSrc = productImgElement ? productImgElement.src.trim() : '';
+
                     // Add the product data to the array
                     prodElements.push({
                         name: productName,
                         price: productPrice,
-                        sale: productSale
+                        sale: productSale,
+                        size: productSize,
+                        //img: imgSrc,
                     });
                 }
             });

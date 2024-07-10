@@ -48,7 +48,6 @@ const picknsave = {
             return prodElements;
 	    });
 
-        console.log(products.length);
         return products;
     }
 }

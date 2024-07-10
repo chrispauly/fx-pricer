@@ -23,8 +23,12 @@ async function startBrowser(){
 	try {
 	    console.log("Opening the browser...");
 	    browser = await puppeteer.launch({
-	        headless: true,
-	        args: ["--disable-setuid-sandbox"],
+	        headless: false,
+			args: [
+				'--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0',
+				//'--window-size=1920,1080',
+				'--disable-setuid-sandbox'
+			],
 	        'ignoreHTTPSErrors': true
 	    });
 	} catch (err) {

@@ -4,7 +4,6 @@ const woodmans = {
 		let page = await browser.newPage();
 		console.log(`Navigating to ${this.baseUrl}...`);
 
-        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0');
         await page.goto(`${this.baseUrl}`, { waitUntil: 'networkidle0' });  //networkidle0 || domcontentloaded
          
         console.log("Woodman's loaded");

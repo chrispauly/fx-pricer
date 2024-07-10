@@ -1,6 +1,6 @@
 const picknsave = {
 	baseUrl: 'https://www.picknsave.com/search',
-	async scraper(browser, searchTerm){
+	async scraper(browser, searchTerm, city, zip){
 		let page = await browser.newPage();
 
         const queryParams = new URLSearchParams({

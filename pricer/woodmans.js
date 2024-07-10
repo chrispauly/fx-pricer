@@ -1,6 +1,6 @@
 const woodmans = {
 	baseUrl: 'https://shopwoodmans.com/',
-	async scraper(browser, zip, searchTerm){
+	async scraper(browser, searchTerm, city, zip){
 		let page = await browser.newPage();
 		console.log(`Navigating to ${this.baseUrl}...`);
 

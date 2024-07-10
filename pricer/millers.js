@@ -1,6 +1,6 @@
 const picknsave = {
 	baseUrl: 'https://www.millerandsonssupermarket.com/stores/',
-	async scraper(browser, city, searchTerm){
+	async scraper(browser, searchTerm, city, zip){
 		let page = await browser.newPage();
 		console.log(`Navigating to ${this.baseUrl}${city}...`);
 

@@ -12,7 +12,6 @@ const picknsave = {
 
 		console.log(`Navigating to ${fullUrl}...`);
 
-        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0');
         await page.goto(`${fullUrl}`, { waitUntil: 'networkidle2' });  //networkidle0 || domcontentloaded
 
         await page.waitForSelector('div.kds-Card', { timeout: 10000 });

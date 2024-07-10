@@ -4,13 +4,14 @@ const festival = {
 		let page = await browser.newPage();
 		console.log(`Navigating to ${this.baseUrl}${city}...`);
 
-        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0');
         await page.goto(`${this.baseUrl}${city}`, { waitUntil: 'networkidle2' });  //networkidle0 || domcontentloaded
          
         await page.waitForSelector('.fp-btn-mystore', { timeout: 10000 });  // Festival foods slow loads this button
+        await page.hover('.fp-btn-mystore');
         await page.click('.fp-btn-mystore');
         
         await page.waitForSelector('.search', { timeout: 10000 });
+        await page.hover('.search');
         await page.click('.search');
         
         await page.waitForSelector('input[aria-label="Search products ..."]', { timeout: 10000 });

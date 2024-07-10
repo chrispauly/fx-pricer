@@ -1,6 +1,6 @@
 const festival = {
 	baseUrl: 'https://www.hy-vee.com/',
-	async scraper(browser, searchTerm){
+	async scraper(browser, searchTerm, city, zip){
 		let page = await browser.newPage();
 		console.log(`Navigating to ${this.baseUrl}...`);
 

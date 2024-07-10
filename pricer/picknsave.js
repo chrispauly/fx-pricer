@@ -13,35 +13,34 @@ const picknsave = {
 		console.log(`Navigating to ${fullUrl}...`);
 
         await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0');
-        await page.goto(`${fullUrl}`, { waitUntil: 'domcontentloaded' });  //networkidle0 || networkidle2
-         
+        await page.goto(`${fullUrl}`, { waitUntil: 'networkidle2' });  //networkidle0 || domcontentloaded
+
         await page.waitForSelector('div.kds-Card', { timeout: 10000 });
-        
+
         const products = await page.evaluate((prodElements) => {
             prodElements = [];
         
             document.querySelectorAll('div.kds-Card').forEach(item => {
                 const productNameElement = item.querySelector('[data-testid="cart-page-item-description"]');
-                const productPriceElement = item.querySelector('s.kds-Price-original');
-                const productSaleElement = item.querySelector('[data-testid="cart-page-item-unit-price"]');
-                const productImgElement = item.querySelector('div.fp-item-image > a > img');
+                const productUnitPriceElement = item.querySelector('[data-testid="cart-page-item-unit-price"]');
+                const productOriginalPriceElement = item.querySelector('s.kds-Price-original');
+                const productSizeElement = item.querySelector('[data-testid="cart-page-item-sizing"]');
+                const productImgElement = item.querySelector('.kds-Image-img');
 
-                if (productNameElement && productPriceElement) {
+                if (productNameElement && productUnitPriceElement) {
                     const productName = productNameElement.innerText.trim();
-                    const productPrice = productPriceElement.innerText.trim().replace('$','');
-                    const productSale = productSaleElement.value.trim();
-                    const productSize = null;
-                    
-                    // try to get UPC
-                    const productUpc = null;
+                    const productPrice = productOriginalPriceElement ? productOriginalPriceElement.innerText.trim().replace('$','') 
+                                                       :  productUnitPriceElement.value.trim();
+                    const productSale = productOriginalPriceElement ? productUnitPriceElement.value.trim() : null;
+                    const productSize = productSizeElement ? productSizeElement.innerText.trim() : null;
                     
                     // Add the product data to the array
                     prodElements.push({
                         name: productName,
-                        size: productSize,
                         price: productPrice,
                         sale: productSale,
-                        upc: productUpc
+                        size: productSize,
+                        //img: imgSrc,
                     });
                 }
             });
@@ -49,6 +48,7 @@ const picknsave = {
             return prodElements;
 	    });
 
+        console.log(products.length);
         return products;
     }
 }

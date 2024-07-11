@@ -1,3 +1,5 @@
+let scrollToBottom = require("scroll-to-bottomjs");
+
 const picknsave = {
 	async scraper({page, data}){
         const baseUrl = 'https://www.millerandsonssupermarket.com/stores/';
@@ -20,6 +22,8 @@ const picknsave = {
         
         await page.waitForSelector('.fp-result-list', { timeout: 10000 });
         
+        await page.evaluate(scrollToBottom);
+
         const products = await page.evaluate((prodElements) => {
             prodElements = [];
         
@@ -28,23 +32,22 @@ const picknsave = {
                 const productPriceElement = item.querySelector('div.fp-item-detail > div.fp-item-price > span.fp-item-base-price');
                 const productSaleElement = item.querySelector('div.fp-item-detail > div.fp-item-sale > span.fp-item-sale-date');
                 const productImgElement = item.querySelector('div.fp-item-image > a > img');
+                const productSizeElement = item.querySelector('div.fp-item-detail > div.fp-item-price > span.fp-item-size');
 
                 if (productNameElement && productPriceElement) {
                     const productName = productNameElement.textContent.trim();
                     const productPrice = productPriceElement.innerText.trim();
                     const productSale = productSaleElement ? productSaleElement.innerText.trim().replace('Sale price:\n','') : null;
-                    
-                    // try to get UPC
-                    let imgSrc = productImgElement ? productImgElement.src.trim() : '';
-                    let upcMatch = imgSrc.match(/images\.freshop\.com\/(\d+)/);
-                    const productUpc = upcMatch ? upcMatch[1] : null;
-                    
+                    const productSize = productSizeElement ? productSizeElement.innerText.trim() : null;
+                    const imgSrc = productImgElement ? productImgElement.src.trim() : '';
+
                     // Add the product data to the array
                     prodElements.push({
                         name: productName,
                         price: productPrice,
                         sale: productSale,
-                        upc: productUpc
+                        size: productSize,
+                        img: imgSrc,
                     });
                 }
             });

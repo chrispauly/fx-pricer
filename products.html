@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Display</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            display: flex;
+            flex-direction: row;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .left {
+            text-align: center;
+            margin-right: 20px;
+        }
+        .left img {
+            max-width: 150px;
+            height: auto;
+        }
+        .products {
+            display: flex;
+            flex-direction: row;
+        }
+        .product {
+            border-left: 1px solid #ddd;
+            padding: 10px;
+        }
+        .product:first-child {
+            border-left: none;
+        }
+        .product p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="productContainer">
+        <!-- Content will be dynamically inserted here -->
+    </div>
+
+    <script>
+        // Sample JSON data
+        const data = {
+            "name": "Festival-Verona",
+            "imglink": "https://www.festfoods.com/wp-content/uploads/logo-2.png",
+            "products": [
+                {
+                    "name": "Equaline Allergy Relief, Non Drowsy, Tablets 30 Ea",
+                    "price": "$13.99",
+                    "sale": null,
+                    "size": "30 ea"
+                },
+                {
+                    "name": "Anthrer, Tablets 30 Ea",
+                    "price": "$3.99",
+                    "sale": "$1.00",
+                    "size": "30 ea"
+                },
+            ]
+        };
+
+        // Function to display the data
+        function displayData(data) {
+            const container = document.getElementById('productContainer');
+
+            // Create the left section with name and image
+            const leftSection = document.createElement('div');
+            leftSection.className = 'left';
+            leftSection.innerHTML = `
+                <h2>${data.name}</h2>
+                <img src="${data.imglink}" alt="${data.name}">
+            `;
+            container.appendChild(leftSection);
+
+            // Create the right section with products
+            const productsSection = document.createElement('div');
+            productsSection.className = 'products';
+
+            data.products.forEach(product => {
+                const productDiv = document.createElement('div');
+                productDiv.className = 'product';
+                productDiv.innerHTML = `
+                    <h3>${product.name}</h3>
+                    <p><strong>Price:</strong> ${product.price}</p>
+                    <p><strong>Sale:</strong> ${product.sale ? product.sale : 'N/A'}</p>
+                    <p><strong>Size:</strong> ${product.size}</p>
+                `;
+                productsSection.appendChild(productDiv);
+            });
+
+            container.appendChild(productsSection);
+        }
+
+        // Display the sample data
+        displayData(data);
+    </script>
+
+</body>
+</html>

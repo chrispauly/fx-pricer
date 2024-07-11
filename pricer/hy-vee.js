@@ -1,5 +1,5 @@
-const festival = {
-	async scraper({page, data}){
+const hyvee = {
+	async scraper({page, data}) {
         const baseUrl = 'https://www.hy-vee.com/';
         const searchTerm = data.searchTerm;
         const city = data.city;
@@ -19,49 +19,33 @@ const festival = {
         await page.waitForNavigation();
         await page.waitForSelector('[data-testid="product-card"]', { timeout: 10000 });
 
-        // await page.click('.fp-btn-mystore');
-        
-        // await page.waitForSelector('.search', { timeout: 10000 });
-        // await page.click('.search');
-        
-        // await page.waitForSelector('#fp-input-search-c-8', { timeout: 10000 });
-        // await page.type('#fp-input-search-c-8', searchTerm);
-        // await page.keyboard.press('Enter');
-        
-        // await page.waitForSelector('.fp-result-list', { timeout: 10000 });
-        
-        // if fp-result-list does not return, means no results for search term
-        console.log(`Loading hy-vee prdoduct data...`);
-
         const products = await page.evaluate((prodElements) => {
             prodElements = [];
         
-            // document.querySelectorAll('div.fp-item-content').forEach(item => {
-            //     const productNameElement = item.querySelector('div.fp-item-detail > div.fp-item-name > a');
-            //     const productPriceElement = item.querySelector('div.fp-item-detail > div.fp-item-price > span.fp-item-base-price');
-            //     const productSaleElement = item.querySelector('div.fp-item-detail > div.fp-item-sale > span.fp-item-sale-date');
-            //     const productImgElement = item.querySelector('div.fp-item-image > a > img');
+            document.querySelectorAll('[data-testid="product-card"]').forEach(item => {
+                const productNameElement = item.querySelector('[data-testid="product-card-title"]');
+                const productPriceElement = item.querySelector('p.price');
+                const productBasePriceElement = item.querySelector('p.base-price');
+                const productImgElement = item.querySelector('[data-testid="productImageContainer"] > img');
+                const productSizeElement = item.querySelector('span.product-subtitle');
 
-            //     if (productNameElement && productPriceElement) {
-            //         const productName = productNameElement.textContent.trim();
-            //         const productPrice = productPriceElement.innerText.trim();
-            //         const productSale = productSaleElement ? productSaleElement.innerText.trim().replace('Sale price:\n','') : null;
-                    
-            //         // try to get UPC
-            //         let imgSrc = productImgElement ? productImgElement.src.trim() : '';
-            //         let upcMatch = imgSrc.match(/images\.freshop\.com\/(\d+)/);
-            //         const productUpc = upcMatch ? upcMatch[1] : null;
-                    
-            //         // Add the product data to the array
-            //         prodElements.push({
-            //             name: productName,
-            //             price: productPrice,
-            //             sale: productSale,
-            //             upc: productUpc
-            //         });
-            //     }
-            // });
-        
+                if (productNameElement && productPriceElement) {
+                    const productName = productNameElement.innerText.trim();
+                    const productPrice = (productBasePriceElement || productPriceElement).innerText.trim();
+                    const productSale = productBasePriceElement ? productPriceElement.innerText.trim() : null;
+                    const productSize = productSizeElement ? productSizeElement.innerText.trim() : null;
+                    const imgSrc = productImgElement ? productImgElement.src.trim() : null;
+
+                    // Add the product data to the array
+                    prodElements.push({
+                        name: productName,
+                        price: productPrice,
+                        sale: productSale,
+                        size: productSize,
+                        img: imgSrc,
+                    });
+                }
+        	});
             return prodElements;
 	    });
 
@@ -69,4 +53,4 @@ const festival = {
     }
 }
 
-module.exports = festival; 
+module.exports = hyvee; 

@@ -1,10 +1,13 @@
 const festival = {
-	baseUrl: 'https://www.hy-vee.com/',
-	async scraper(browser, searchTerm, city, zip){
-		let page = await browser.newPage();
-		console.log(`Navigating to ${this.baseUrl}...`);
+	async scraper({page, data}){
+        const baseUrl = 'https://www.hy-vee.com/';
+        const searchTerm = data.searchTerm;
+        const city = data.city;
+        const zip = data.zip;
 
-        await page.goto(`${this.baseUrl}`, { waitUntil: 'networkidle2' });  //networkidle0 || domcontentloaded
+		console.log(`Navigating to ${baseUrl}...`);
+
+        await page.goto(`${baseUrl}`, { waitUntil: 'networkidle2' });  //networkidle0 || domcontentloaded
          
         const btnSearch = await page.waitForSelector('button[aria-label="Search"]', { timeout: 10000 });
         btnSearch.click();

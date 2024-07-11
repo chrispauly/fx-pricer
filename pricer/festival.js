@@ -1,10 +1,13 @@
 const festival = {
-	baseUrl: 'https://www.festfoods.com/stores/',
-	async scraper(browser, searchTerm, city, zip){
-		let page = await browser.newPage();
-		console.log(`Navigating to ${this.baseUrl}${city}...`);
+	async scraper({page, data}){
+        const baseUrl = 'https://www.festfoods.com/stores/';
+        const searchTerm = data.searchTerm;
+        const city = data.city;
+        const zip = data.zip;
 
-        await page.goto(`${this.baseUrl}${city}`, { waitUntil: 'networkidle2' });  //networkidle0 || domcontentloaded
+		console.log(`Navigating to ${baseUrl}${city}...`);
+
+        await page.goto(`${baseUrl}${city}`, { waitUntil: 'networkidle2' });  //networkidle0 || domcontentloaded
          
         await page.waitForSelector('.fp-btn-mystore', { timeout: 10000 });  // Festival foods slow loads this button
         await page.hover('.fp-btn-mystore');

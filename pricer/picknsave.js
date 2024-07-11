@@ -1,14 +1,16 @@
 const picknsave = {
-	baseUrl: 'https://www.picknsave.com/search',
-	async scraper(browser, searchTerm, city, zip){
-		let page = await browser.newPage();
+	async scraper({page, data}){
+        const baseUrl = 'https://www.picknsave.com/search';
+        const searchTerm = data.searchTerm;
+        const city = data.city;
+        const zip = data.zip;
 
         const queryParams = new URLSearchParams({
             query: searchTerm,
             searchType: "default_search"
         });
     
-        const fullUrl = `${this.baseUrl}?${queryParams.toString()}`;
+        const fullUrl = `${baseUrl}?${queryParams.toString()}`;
 
 		console.log(`Navigating to ${fullUrl}...`);
 

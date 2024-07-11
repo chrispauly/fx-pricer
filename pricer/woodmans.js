@@ -1,10 +1,13 @@
 const woodmans = {
-	baseUrl: 'https://shopwoodmans.com/',
-	async scraper(browser, searchTerm, city, zip){
-		let page = await browser.newPage();
-		console.log(`Navigating to ${this.baseUrl}...`);
+	async scraper({page, data}){
+        const baseUrl = 'https://shopwoodmans.com/';
+        const searchTerm = data.searchTerm;
+        const city = data.city;
+        const zip = data.zip;
 
-        await page.goto(`${this.baseUrl}`, { waitUntil: 'networkidle0' });  //networkidle0 || domcontentloaded
+		console.log(`Navigating to ${baseUrl}...`);
+
+        await page.goto(`${baseUrl}`, { waitUntil: 'networkidle0' });  //networkidle0 || domcontentloaded
          
         console.log("Woodman's loaded");
         await page.waitForSelector('input', { timeout: 10000 });

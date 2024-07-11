@@ -1,10 +1,12 @@
 const picknsave = {
-	baseUrl: 'https://www.millerandsonssupermarket.com/stores/',
-	async scraper(browser, searchTerm, city, zip){
-		let page = await browser.newPage();
-		console.log(`Navigating to ${this.baseUrl}${city}...`);
+	async scraper({page, data}){
+        const baseUrl = 'https://www.millerandsonssupermarket.com/stores/';
+        const searchTerm = data.searchTerm;
+        const city = data.city;
+        const zip = data.zip;
+		console.log(`Navigating to ${baseUrl}${city}...`);
 
-        await page.goto(`${this.baseUrl}${city}`, { waitUntil: 'networkidle2' });  //networkidle0 || domcontentloaded
+        await page.goto(`${baseUrl}${city}`, { waitUntil: 'networkidle2' });  //networkidle0 || domcontentloaded
          
         await page.waitForSelector('.fp-btn-mystore', { timeout: 10000 });  
         await page.click('.fp-btn-mystore');

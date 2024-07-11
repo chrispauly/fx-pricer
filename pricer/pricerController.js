@@ -4,10 +4,8 @@ const woodmans = require('./woodmans');
 const hyvee = require('./hy-vee');
 const millers = require('./millers');
 
-async function scrapeAll(browserInstance, searchTerm){
-	let browser;
+async function scrapeAll(cluster, searchTerm){
 	try{
-		browser = await browserInstance;
         const productResults = [];
         
         const groceryData = [];
@@ -19,7 +17,7 @@ async function scrapeAll(browserInstance, searchTerm){
 
 		// Call the scraper for different set of books to be scraped
         await Promise.all(groceryData.map(async (item) => { 
-            const scraped = await item.fxn.scraper(browser, searchTerm, 'verona', '53719');
+            const scraped = await cluster.execute({ searchTerm: searchTerm, city: 'verona', zip: '53719'}, item.fxn.scraper);
             productResults.push({ name: item.name, imglink: item.imglink, products: scraped });
             console.log(`Finished ${item.name}`);
           }));
@@ -33,7 +31,6 @@ async function scrapeAll(browserInstance, searchTerm){
         //     groceryData['millers'] = await millers.scraper(browser, 'verona', searchTerm)
         //   ]);
 	
-		await browser.close();
         return productResults;
 	}
 	catch(err){
@@ -41,4 +38,4 @@ async function scrapeAll(browserInstance, searchTerm){
 	}
 }
 
-module.exports = (browserInstance, searchTerm) => scrapeAll(browserInstance, searchTerm)
+module.exports = (cluster, searchTerm) => scrapeAll(cluster, searchTerm)

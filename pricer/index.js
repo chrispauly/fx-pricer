@@ -25,7 +25,7 @@ module.exports = async function (context, req) {
     const searchTerm = req.query.search || "ketchup 24";
     const cluster = await Cluster.launch({
         concurrency: Cluster.CONCURRENCY_BROWSER,
-        maxConcurrency: 3,
+        maxConcurrency: 5,
         puppeteer: puppeteer,
         puppeteerOptions: {
 	        headless: true,

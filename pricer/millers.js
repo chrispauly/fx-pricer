@@ -10,13 +10,13 @@ const picknsave = {
 
         await page.goto(`${baseUrl}${city}`, { waitUntil: 'networkidle2' });  //networkidle0 || domcontentloaded
          
-        await page.waitForSelector('.fp-btn-mystore', { timeout: 10000 });  
+        await page.waitForSelector('.fp-btn-mystore');  
         await page.click('.fp-btn-mystore');
         
-        await page.waitForSelector('.search', { timeout: 10000 });
+        await page.waitForSelector('.search');
         await page.click('.search');
         
-        await page.waitForSelector('input[aria-label="Search products ..."]', { timeout: 10000 });
+        await page.waitForSelector('input[aria-label="Search products ..."]');
         await page.type('input[aria-label="Search products ..."]', searchTerm);
         await page.keyboard.press('Enter');
         

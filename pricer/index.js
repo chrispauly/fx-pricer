@@ -22,35 +22,51 @@ puppeteer.use(
 
 module.exports = async function (context, req) {
 
-    const searchTerm = req.query.search || "ketchup 24";
-    const cluster = await Cluster.launch({
-        concurrency: Cluster.CONCURRENCY_BROWSER,
-        maxConcurrency: 5,
-        puppeteer: puppeteer,
-        puppeteerOptions: {
-	        headless: true,
-			args: [
-				'--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0',
-				//'--window-size=1920,1080',
-				'--disable-setuid-sandbox'
-			],
-	        'ignoreHTTPSErrors': true
-	    },
-        monitor: false
-      });
-    
-    // Pass the cluster instance to the pricer controller
-    const prices = await pricerController(cluster, searchTerm);
-    
-    await cluster.idle();
-    await cluster.close();
+    const storeQuery = req.query.store; 
 
-    context.res = {
-        body: prices,
-        headers: {
-            "content-type": "application/json"
-        }
-    };
+    if(storeQuery) {
+      const storeNames = storeQuery.split("|");
+      const searchTerm = req.query.search || "ketchup 24";
+      console.log(`search: ${searchTerm}  stores: ${storeNames}`);
+      const cluster = await Cluster.launch({
+          concurrency: Cluster.CONCURRENCY_BROWSER,
+          maxConcurrency: storeNames.length,
+          puppeteer: puppeteer,
+          puppeteerOptions: {
+            headless: true,
+        args: [
+          '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0',
+          //'--window-size=1920,1080',
+          '--disable-setuid-sandbox'
+        ],
+            'ignoreHTTPSErrors': true
+        },
+          monitor: false
+        });
+      
+      // Pass the cluster instance to the pricer controller
+      const prices = await pricerController(cluster, searchTerm, storeNames);
+      
+      await cluster.idle();
+      await cluster.close();
+
+      context.res = {
+          body: prices,
+          headers: {
+              "content-type": "application/json"
+          }
+      };
+    } else {
+        const storesBody = await require('./groceryStores').storesHtml();
+        context.res = {
+          body: storesBody,
+          headers: {
+              "content-type": "text/html"
+          }
+      };
+    }
+
+
     
     // const screenshotBuffer = await page.screenshot({ fullPage: true });
     // context.res = {

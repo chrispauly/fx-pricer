@@ -1,41 +1,32 @@
-const festival = require('./festival');
-const picknsave = require('./picknsave');
-const woodmans = require('./woodmans');
-const hyvee = require('./hy-vee');
-const millers = require('./millers');
+const groceryStores = require('./groceryStores');
 
-async function scrapeAll(cluster, searchTerm){
-	try{
-        const productResults = [];
-        
-        const groceryData = [];
-        groceryData.push({ fxn: festival,  name: 'Festival-Verona', imglink: "https://www.festfoods.com/wp-content/uploads/logo-2.png" });
-        groceryData.push({ fxn: picknsave, name: 'PickNSave',       imglink: "https://www.picknsave.com/content/v2/binary/image/picknsave_svg_logo--freshcart_picknsave_color_logo--picknsave.svg" });
-        groceryData.push({ fxn: woodmans,  name: 'Woodmans-West',   imglink: "https://www.instacart.com/assets/domains/store_configuration/logo/1205/c2f851f7-56de-4f36-a942-3feb9415194e.png" });
-        groceryData.push({ fxn: hyvee,     name: 'Hy-Vee',          imglink: "https://hy-vee.com/images/favicon.ico" });
-        groceryData.push({ fxn: millers,   name: 'Millers-Verona',  imglink: "https://www.millerandsonssupermarket.com/wp-content/themes/fp-wp-b-millers/resources/images/logo/logo.jpg" });
+async function scrapeAll(cluster, searchTerm, storeNames) {
+  const productResults = [];
 
-		// Call the scraper for different set of books to be scraped
-        await Promise.all(groceryData.map(async (item) => { 
-            const scraped = await cluster.execute({ searchTerm: searchTerm, city: 'verona', zip: '53719'}, item.fxn.scraper);
-            productResults.push({ name: item.name, imglink: item.imglink, products: scraped });
-            console.log(`Finished ${item.name}`);
-          }));
+  await Promise.all(groceryStores.stores.map(async (item) => {
+    try {
+      if(storeNames.includes(item.name)) {
+        console.log(`${item.name} started`);
+        const scraped = await cluster.execute({ searchTerm: searchTerm, city: 'verona', zip: '53719' }, item.fxn.scraper);
+        productResults.push({ name: item.name, imglink: item.imglink, products: scraped });
+        console.log(`${item.name} finished`);
+      }
+    }
+    catch (err) {
+      console.log(`${item.name} scrapeAll error => `, err);
+    }
+  }));
 
-        // let groceryData = {};
-        // await Promise.all([
-        //     groceryData['festival'] = await festival.scraper(browser, 'verona', searchTerm),
-        //     groceryData['picknsave'] = await picknsave.scraper(browser, searchTerm),
-        //     groceryData['woodmans'] = await woodmans.scraper(browser, '53719', searchTerm),
-        //     groceryData['hyvee'] = await hyvee.scraper(browser, searchTerm),
-        //     groceryData['millers'] = await millers.scraper(browser, 'verona', searchTerm)
-        //   ]);
-	
-        return productResults;
-	}
-	catch(err){
-		console.log("scrapeAll error => ", err);
-	}
+  // let groceryData = {};
+  // await Promise.all([
+  //     groceryData['festival'] = await festival.scraper(browser, 'verona', searchTerm),
+  //     groceryData['picknsave'] = await picknsave.scraper(browser, searchTerm),
+  //     groceryData['woodmans'] = await woodmans.scraper(browser, '53719', searchTerm),
+  //     groceryData['hyvee'] = await hyvee.scraper(browser, searchTerm),
+  //     groceryData['millers'] = await millers.scraper(browser, 'verona', searchTerm)
+  //   ]);
+
+  return productResults;
 }
 
-module.exports = (cluster, searchTerm) => scrapeAll(cluster, searchTerm)
+module.exports = (cluster, searchTerm, storeNames) => scrapeAll(cluster, searchTerm, storeNames)

@@ -16,7 +16,7 @@ const picknsave = {
 
         await page.goto(`${fullUrl}`, { waitUntil: 'networkidle2' });  //networkidle0 || domcontentloaded
 
-        await page.waitForSelector('div.kds-Card', { timeout: 10000 });
+        await page.waitForSelector('div.kds-Card');
 
         const products = await page.evaluate((prodElements) => {
             prodElements = [];

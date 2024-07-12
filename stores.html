@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List of Store Names</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .links-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .link-item {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="links-container" id="links-container">
+        <!-- Links will be dynamically inserted here -->
+    </div>
+
+    <script>
+        const linksData = {jsonStores};
+
+        function createLinkItem(link) {
+            const linkItem = document.createElement('div');
+            linkItem.className = 'link-item';
+
+            const anchor = document.createElement('a');
+            anchor.href = link.name;
+            anchor.textContent = link.name;
+
+            linkItem.appendChild(anchor);
+
+            return linkItem;
+        }
+
+        const linksContainer = document.getElementById('links-container');
+
+        linksData.forEach(link => {
+            const linkItem = createLinkItem(link);
+            linksContainer.appendChild(linkItem);
+        });
+    </script>
+</body>
+</html>

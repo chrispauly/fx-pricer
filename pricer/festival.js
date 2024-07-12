@@ -9,19 +9,19 @@ const festival = {
 
         await page.goto(`${baseUrl}${city}`, { waitUntil: 'networkidle2' });  //networkidle0 || domcontentloaded
          
-        await page.waitForSelector('.fp-btn-mystore', { timeout: 10000 });  // Festival foods slow loads this button
+        await page.waitForSelector('.fp-btn-mystore');  // Festival foods slow loads this button
         await page.hover('.fp-btn-mystore');
         await page.click('.fp-btn-mystore');
         
-        await page.waitForSelector('.search', { timeout: 10000 });
+        await page.waitForSelector('.search');
         await page.hover('.search');
         await page.click('.search');
         
-        await page.waitForSelector('input[aria-label="Search products ..."]', { timeout: 10000 });
+        await page.waitForSelector('input[aria-label="Search products ..."]');
         await page.type('input[aria-label="Search products ..."]', searchTerm);
         await page.keyboard.press('Enter');
         
-        await page.waitForSelector('.fp-result-list', { timeout: 10000 });
+        await page.waitForSelector('.fp-result-list');
         
 // if fp-result-list does not return, means no results for search term
 

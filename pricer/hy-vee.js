@@ -9,15 +9,15 @@ const hyvee = {
 
         await page.goto(`${baseUrl}`, { waitUntil: 'networkidle2' });  //networkidle0 || domcontentloaded
          
-        const btnSearch = await page.waitForSelector('button[aria-label="Search"]', { timeout: 10000 });
+        const btnSearch = await page.waitForSelector('button[aria-label="Search"]');
         btnSearch.click();
 
-        await page.waitForSelector('#search-input', { timeout: 10000 });
+        await page.waitForSelector('#search-input');
         await page.type('#search-input', searchTerm);
         await page.keyboard.press('Enter');
 
         await page.waitForNavigation();
-        await page.waitForSelector('[data-testid="product-card"]', { timeout: 10000 });
+        await page.waitForSelector('[data-testid="product-card"]');
 
         const products = await page.evaluate((prodElements) => {
             prodElements = [];

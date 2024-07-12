@@ -10,7 +10,7 @@ const woodmans = {
         await page.goto(`${baseUrl}`, { waitUntil: 'networkidle0' });  //networkidle0 || domcontentloaded
          
         console.log("Woodman's loaded");
-        await page.waitForSelector('input', { timeout: 10000 });
+        await page.waitForSelector('input');
         console.log("Found input");
         await page.type('input', zip);
         console.log(`Entered ${zip}`);
@@ -24,11 +24,11 @@ const woodmans = {
 
         if(instoreBtn) { instoreBtn.click(); }
 
-        await page.waitForSelector('input#search-bar-input', { timeout: 10000 });
+        await page.waitForSelector('input#search-bar-input');
         await page.type('input#search-bar-input', searchTerm);
         await page.keyboard.press('Enter');
 
-        await page.waitForSelector('div[aria-label="Product"]', { timeout: 10000 });
+        await page.waitForSelector('div[aria-label="Product"]');
         //await page.waitForSelector('xpath///button/span[text() = "Load more"]');
 
         await new Promise(r => setTimeout(r, 2000));

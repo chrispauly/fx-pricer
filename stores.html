@@ -38,7 +38,7 @@
             linkItem.className = 'link-item';
 
             const anchor = document.createElement('a');
-            anchor.href = link.name;
+            anchor.href = "https://fx-pricer.azurewebsites.net/api/pricer?store=" + link.name;
             anchor.textContent = link.name;
 
             linkItem.appendChild(anchor);

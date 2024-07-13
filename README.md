@@ -7,4 +7,19 @@ Code created with inspiration from the following articles:
 * https://stackoverflow.com/a/46086037
 
 
+To Install and Deploy
+Make sure you have the following installed locally
+NodeJS
+Azure func tools 
+az CLI
+
+
+Run the following command to deploy
+func azure functionapp publish fx-pricer --build remote
+
+
+Sample call
+https://fx-pricer.azurewebsites.net/api/pricer?search=cheerios&store=PickNSave|Festival-Verona|Millers-Verona
+
+
 

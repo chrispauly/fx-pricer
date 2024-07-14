@@ -32,13 +32,15 @@ module.exports = async function (context, req) {
           concurrency: Cluster.CONCURRENCY_BROWSER,
           maxConcurrency: storeNames.length,
           puppeteer: puppeteer,
+          timeout: 120000,      // 2 minute timeout
           puppeteerOptions: {
             headless: true,
-        args: [
-          '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0',
-          //'--window-size=1920,1080',
-          '--disable-setuid-sandbox'
-        ],
+            timeout: 120000,      // 2 minute timeout
+            args: [
+              '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0',
+              //'--window-size=1920,1080',
+              '--disable-setuid-sandbox'
+            ],
             'ignoreHTTPSErrors': true
         },
           monitor: false

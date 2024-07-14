@@ -17,15 +17,6 @@ async function scrapeAll(cluster, searchTerm, storeNames) {
     }
   }));
 
-  // let groceryData = {};
-  // await Promise.all([
-  //     groceryData['festival'] = await festival.scraper(browser, 'verona', searchTerm),
-  //     groceryData['picknsave'] = await picknsave.scraper(browser, searchTerm),
-  //     groceryData['woodmans'] = await woodmans.scraper(browser, '53719', searchTerm),
-  //     groceryData['hyvee'] = await hyvee.scraper(browser, searchTerm),
-  //     groceryData['millers'] = await millers.scraper(browser, 'verona', searchTerm)
-  //   ]);
-
   return productResults;
 }
 

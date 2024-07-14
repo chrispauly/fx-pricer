@@ -1,112 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Display</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f4f4f4;
-        }
-        .container {
-            display: flex;
-            flex-direction: row;
-            background-color: #fff;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .left {
-            text-align: center;
-            margin-right: 20px;
-        }
-        .left img {
-            max-width: 150px;
-            height: auto;
-        }
-        .products {
-            display: flex;
-            flex-direction: row;
-        }
-        .product {
-            border-left: 1px solid #ddd;
-            padding: 10px;
-        }
-        .product:first-child {
-            border-left: none;
-        }
-        .product p {
-            margin: 5px 0;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Store Products</title>
+  <style>
+    .container {
+      width: 100%;
+      margin-bottom: 40px;
+    }
+    .store {
+      width: 100%;
+      display: block;
+      clear: both;
+      margin-bottom: 20px;
+    }
+    .left {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .products {
+      display: flex;
+      overflow-x: auto;
+    }
+    .product {
+      min-width: 200px;
+      margin-right: 15px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+  </style>
 </head>
 <body>
+  <div id="productContainer" class="container"></div>
 
-    <div class="container" id="productContainer">
-        <!-- Content will be dynamically inserted here -->
-    </div>
+  <script>
+    // Example JSON data
+    const storeData = [
+      {
+        name: "PickNSave",
+        imgLink: "https://www.picknsave.com/content/v2/binary/image/picknsave_svg_logo--freshcart_picknsave_color_logo--picknsave.svg",
+        products: [
+          { name: "General Mills Cheerios Cereal", price: "4.29", sale: "2.99", size: "8.9 oz" },
+          { name: "General Mills Honey Nut Cheerios Cereal", price: "4.29", sale: "2.99", size: "10.8 oz" },
+          { name: "General Mills Cheerios Giant Size Cereal", price: "7.49", sale: "4.99", size: "20 oz" },
+          { name: "General Mills Cheerios Family Size Cereal", price: "5.99", sale: "N/A", size: "18 oz" },
+          { name: "General Mills Honey Nut Cheerios Giant Size Cereal", price: "7.49", sale: "4.99", size: "27.2 oz" }
+        ]
+      },
+      {
+        name: "Millers-Verona",
+        imgLink: "https://www.millerandsonssupermarket.com/wp-content/themes/fp-wp-b-millers/resources/images/logo/logo.jpg",
+        products: [
+          { name: "Honey Nut Cheerios Cereal", price: "$6.89", sale: "N/A", size: "15.4 oz" },
+          { name: "Cheerios Cereal, Large Size 12 oz", price: "$6.89", sale: "N/A", size: "12 oz" },
+          { name: "Cheerios Cereal 8.9 oz", price: "$5.19", sale: "2 for $6.00 (07/07/24 - 07/14/24)", size: "8.9 oz" },
+          { name: "Cheerios Cereal 10.8 oz", price: "$5.39", sale: "2 for $6.00 (07/07/24 - 07/14/24)", size: "10.8 oz" },
+          { name: "General Mills Honey Nut Cheerios", price: "$7.39", sale: "$4.99 (07/13/24 - 07/19/24)", size: "18.8 oz" }
+        ]
+      },
+      {
+        name: "Festival-Verona",
+        imgLink: "https://www.festfoods.com/wp-content/uploads/logo-2.png",
+        products: [
+          { name: "Cheerios Cereal, Very Berry, Large Size 14.5 oz", price: "$6.99", sale: "$5.99(05/24/24 - 07/30/24)", size: "14.5 oz" },
+          { name: "Cheerios Cereal 10.8 oz", price: "$6.19", sale: "$3.99(07/05/24 - 07/30/24)", size: "10.8 oz" },
+          { name: "Cheerios Cereal, Multi Grain, Family Size 18 oz", price: "$7.99", sale: "$6.49(05/24/24 - 07/30/24)", size: "18 oz" },
+          { name: "Cheerios Cereal, Large Size, Oats 'n Honey 18.2 oz", price: "$6.99", sale: "$5.99(05/24/24 - 07/30/24)", size: "18.2 oz" },
+          { name: "Cheerios Cereal, Almond, Large Size 18.2 oz", price: "$6.99", sale: "$5.99(05/24/24 - 07/30/24)", size: "18.2 oz" }
+        ]
+      }
+    ];
 
-    <script>
-        // Sample JSON data
-        const data = {
-            "name": "Festival-Verona",
-            "imglink": "https://www.festfoods.com/wp-content/uploads/logo-2.png",
-            "products": [
-                {
-                    "name": "Equaline Allergy Relief, Non Drowsy, Tablets 30 Ea",
-                    "price": "$13.99",
-                    "sale": null,
-                    "size": "30 ea"
-                },
-                {
-                    "name": "Anthrer, Tablets 30 Ea",
-                    "price": "$3.99",
-                    "sale": "$1.00",
-                    "size": "30 ea"
-                },
-            ]
-        };
+    function renderStores(data) {
+      const container = document.getElementById('productContainer');
 
-        // Function to display the data
-        function displayData(data) {
-            const container = document.getElementById('productContainer');
+      data.forEach(store => {
+        // Create store div
+        const storeDiv = document.createElement('div');
+        storeDiv.className = 'store';
 
-            // Create the left section with name and image
-            const leftSection = document.createElement('div');
-            leftSection.className = 'left';
-            leftSection.innerHTML = `
-                <h2>${data.name}</h2>
-                <img src="${data.imglink}" alt="${data.name}">
-            `;
-            container.appendChild(leftSection);
+        // Create and append the store info
+        const leftDiv = document.createElement('div');
+        leftDiv.className = 'left';
+        const storeName = document.createElement('h2');
+        storeName.textContent = store.name;
+        const storeImage = document.createElement('img');
+        storeImage.src = store.imgLink;
+        storeImage.alt = store.name;
 
-            // Create the right section with products
-            const productsSection = document.createElement('div');
-            productsSection.className = 'products';
+        leftDiv.appendChild(storeName);
+        leftDiv.appendChild(storeImage);
 
-            data.products.forEach(product => {
-                const productDiv = document.createElement('div');
-                productDiv.className = 'product';
-                productDiv.innerHTML = `
-                    <h3>${product.name}</h3>
-                    <p><strong>Price:</strong> ${product.price}</p>
-                    <p><strong>Sale:</strong> ${product.sale ? product.sale : 'N/A'}</p>
-                    <p><strong>Size:</strong> ${product.size}</p>
-                `;
-                productsSection.appendChild(productDiv);
-            });
+        // Create and append the products
+        const productsDiv = document.createElement('div');
+        productsDiv.className = 'products';
 
-            container.appendChild(productsSection);
-        }
+        store.products.forEach(product => {
+          const productDiv = document.createElement('div');
+          productDiv.className = 'product';
+          const productName = document.createElement('h3');
+          productName.textContent = product.name;
+          const productPrice = document.createElement('p');
+          productPrice.innerHTML = `<strong>Price:</strong> ${product.price}`;
+          const productSale = document.createElement('p');
+          productSale.innerHTML = `<strong>Sale:</strong> ${product.sale}`;
+          const productSize = document.createElement('p');
+          productSize.innerHTML = `<strong>Size:</strong> ${product.size}`;
 
-        // Display the sample data
-        displayData(data);
-    </script>
+          productDiv.appendChild(productName);
+          productDiv.appendChild(productPrice);
+          productDiv.appendChild(productSale);
+          productDiv.appendChild(productSize);
 
+          productsDiv.appendChild(productDiv);
+        });
+
+        storeDiv.appendChild(leftDiv);
+        storeDiv.appendChild(productsDiv);
+        container.appendChild(storeDiv);
+      });
+    }
+
+    // Render the stores on page load
+    renderStores(storeData);
+  </script>
 </body>
 </html>

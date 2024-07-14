@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search Page</title>
+    <title>Lookup Prices</title>
     <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
         body {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            font-family: Arial, sans-serif;
+            overflow-y: auto;
         }
         #inputBox {
             width: 50%;
@@ -27,12 +29,45 @@
         }
         #results {
             margin-top: 20px;
-            width: 60%;
+            width: 90%;
             text-align: center;
         }
         #spinner {
             display: none;
             margin-top: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+        }
+        .store {
+            width: 100%;
+            display: block;
+            clear: both;
+            margin-bottom: 20px;
+        }
+        .left {
+            text-align: center;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .left img {
+            width: 100%;
+            max-width: 200px;
+            /* Set a reasonable max-width to prevent overly large images */
+        }
+        .products {
+            display: flex;
+            overflow-x: auto;
+        }
+        .product {
+            min-width: 200px;
+            margin-right: 15px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            box-sizing: border-box;
         }
     </style>
 </head>
@@ -41,12 +76,71 @@
     <input type="text" id="inputBox" placeholder="Enter grocery item">
     <button id="searchButton">Find prices</button>
     <div id="spinner">Finding prices...</div>
-    <div id="results"></div>
-
+    <div id="productContainer" class="container"></div>
     <script>
+        // Function to display the data
+        function displayData(data) {
+            const container = document.getElementById('productContainer');
+
+            data.forEach(store => {
+            // Create the left section with name and image
+                const storeDiv = document.createElement('div');
+                storeDiv.className = 'store';
+                container.appendChild(storeDiv);
+
+                const leftSection = document.createElement('div');
+                leftSection.className = 'left';
+                leftSection.innerHTML = `
+                    <h2>${store.name}</h2>
+                    <img src="${store.imglink}" alt="${store.name}">
+                `;
+                storeDiv.appendChild(leftSection);
+
+                // Create the right section with products
+                const productsSection = document.createElement('div');
+                productsSection.className = 'products';
+                let count = 1;
+                for(const product of store.products) {
+                    const productDiv = document.createElement('div');
+                    productDiv.className = 'product';
+                    productDiv.innerHTML = `
+                        <h3>${product.name}</h3>
+                        <p><strong>Price:</strong> ${product.price}</p>
+                        <p><strong>Sale:</strong> ${product.sale ? product.sale : 'N/A'}</p>
+                        <p><strong>Size:</strong> ${product.size}</p>
+                    `;
+                    productsSection.appendChild(productDiv);
+                    //if(++count>5) break;
+                }
+
+                storeDiv.appendChild(productsSection);
+            });
+        }
+
+        function displayError(error) {
+            const container = document.getElementById('productContainer');
+
+            const leftSection = document.createElement('div');
+            leftSection.className = 'left';
+            leftSection.innerHTML = JSON.stringify(error);
+            container.appendChild(leftSection);
+        }
+
+        async function doPriceLookup(store, searchTerm) {
+            try {
+                const response = await fetch(`https://fx-pricer.azurewebsites.net/api/pricer?store=${store}&search=${encodeURIComponent(searchTerm)}`);
+                const data = await response.json();
+                console.log(`${store} fetch completed`);
+                displayData(data);
+            } catch(error) {
+                console.log(`${store} fetch errored`);
+                displayError(`${store}: ${error.message}`);
+            }
+        }
+
         const inputBox = document.getElementById('inputBox');
         const searchButton = document.getElementById('searchButton');
-        const resultsDiv = document.getElementById('results');
+        const productContainerDiv = document.getElementById('productContainer');
         const spinner = document.getElementById('spinner');
 
         // Function to handle search
@@ -54,17 +148,27 @@
             const query = inputBox.value.trim();
             if (!query) return;
 
-            resultsDiv.innerHTML = '';
+            productContainerDiv.innerHTML = '';
             spinner.style.display = 'block';
 
             try {
-                const response = await fetch(`https://gprice.chrispauly.com?search=${encodeURIComponent(query)}`);
-                const data = await response.json();
+
+                // Create an array of fetch promises
+                //const fetchPromises = ['Festival-Verona','PickNSave','Woodmans-West','Hy-Vee','Millers-Verona']
+                const fetchPromises = ['Festival-Verona','PickNSave','Millers-Verona','Woodmans-West','Hy-Vee']
+                    .map(store => doPriceLookup(store, query));
+
+                // Wait for all fetch promises to settle
+                const results = await Promise.allSettled(fetchPromises);
+
+                results.forEach(p => {
+                    console.log(p.status);
+                });
                 spinner.style.display = 'none';
-                resultsDiv.innerHTML = JSON.stringify(data, null, 2);
             } catch (error) {
+                
                 spinner.style.display = 'none';
-                resultsDiv.innerHTML = 'An error occurred. Please try again.';
+                productContainerDiv.innerHTML = 'An error occurred. Please try again.';
             }
         }
 

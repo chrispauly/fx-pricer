@@ -5,35 +5,44 @@ const woodmans = {
         const city = data.city;
         const zip = data.zip;
 
-		console.log(`Navigating to ${baseUrl}...`);
+		console.log(`Woodmans: Navigating to ${baseUrl}...`);
         page.setDefaultNavigationTimeout(120000);       // default was 30000
 
         await page.goto(`${baseUrl}`, { waitUntil: 'networkidle0' });  //networkidle0 || domcontentloaded
-         
-        console.log("Woodman's loaded");
+        console.log(`Woodmans: Waiting for page to load...`);
+
         await page.waitForSelector('input');
-        console.log("Found input");
         await page.type('input', zip);
-        console.log(`Entered ${zip}`);
         await page.keyboard.press('Enter');
+        console.log(`Woodmans: Added zip and pressed Enter...`);
+
         await page.waitForNavigation();
 
-        console.log("Searching for In-Store button...");
+        console.log("Woodmans: Searching for In-Store button...");
 
         //const instoreBtn = await page.waitForXPath('//button/span/span[text() = "In-Store"]');
         const instoreBtn = await page.waitForSelector('xpath///button/span/span[text() = "In-Store"]');
 
-        if(instoreBtn) { instoreBtn.click(); }
+        if(instoreBtn) { 
+            instoreBtn.click(); 
+            console.log(`Woodmans: Clicked Instore button...`);
+        } else {
+            console.error(`Woodmans: Instore button not found...`);
+        }
 
+        
         await page.waitForSelector('input#search-bar-input');
         await page.type('input#search-bar-input', searchTerm);
         await page.keyboard.press('Enter');
+        console.log(`Woodmans: Added search terms and pressed Enter...`);
 
         await page.waitForSelector('div[aria-label="Product"]');
         //await page.waitForSelector('xpath///button/span[text() = "Load more"]');
 
+        console.log(`Woodmans: Pausing for 2 seconds to allow browser to load more products...`);
         await new Promise(r => setTimeout(r, 2000));
 
+        console.log(`Woodmans: Sending eval to browser to load products...`);
         const products = await page.evaluate((prodElements) => {
             prodElements = [];
         

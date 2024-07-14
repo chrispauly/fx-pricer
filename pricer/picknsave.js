@@ -12,13 +12,15 @@ const picknsave = {
     
         const fullUrl = `${baseUrl}?${queryParams.toString()}`;
 
-		console.log(`Navigating to ${fullUrl}...`);
+		console.log(`PickNSave: Navigating to ${fullUrl}...`);
         page.setDefaultNavigationTimeout(120000);       // default was 30000
 
         await page.goto(`${fullUrl}`, { waitUntil: 'networkidle2' });  //networkidle0 || domcontentloaded
+        console.log(`PickNSave: Waiting for page to load...`);
 
         await page.waitForSelector('div.kds-Card');
 
+        console.log(`PickNSave: Sending eval to browser to load products...`);
         const products = await page.evaluate((prodElements) => {
             prodElements = [];
         

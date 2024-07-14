@@ -5,21 +5,25 @@ const hyvee = {
         const city = data.city;
         const zip = data.zip;
 
-		console.log(`Navigating to ${baseUrl}...`);
+		console.log(`Hy-Vee: Navigating to ${baseUrl}...`);
         page.setDefaultNavigationTimeout(120000);       // default was 30000
 
         await page.goto(`${baseUrl}`, { waitUntil: 'networkidle2' });  //networkidle0 || domcontentloaded
          
+        console.log(`Hy-Vee: Waiting for search button...`);
         const btnSearch = await page.waitForSelector('button[aria-label="Search"]');
         btnSearch.click();
+        console.log(`Hy-Vee: Clicked search button...`);
 
         await page.waitForSelector('#search-input');
         await page.type('#search-input', searchTerm);
         await page.keyboard.press('Enter');
+        console.log(`Hy-Vee: Added search term and pressed Enter...`);
 
         await page.waitForNavigation();
         await page.waitForSelector('[data-testid="product-card"]');
 
+        console.log(`Hy-Vee: Sending eval to browser to load products...`);
         const products = await page.evaluate((prodElements) => {
             prodElements = [];
         

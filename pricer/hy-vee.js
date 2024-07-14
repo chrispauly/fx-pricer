@@ -6,6 +6,7 @@ const hyvee = {
         const zip = data.zip;
 
 		console.log(`Navigating to ${baseUrl}...`);
+        page.setDefaultNavigationTimeout(120000);       // default was 30000
 
         await page.goto(`${baseUrl}`, { waitUntil: 'networkidle2' });  //networkidle0 || domcontentloaded
          

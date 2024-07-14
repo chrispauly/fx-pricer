@@ -13,6 +13,7 @@ const picknsave = {
         const fullUrl = `${baseUrl}?${queryParams.toString()}`;
 
 		console.log(`Navigating to ${fullUrl}...`);
+        page.setDefaultNavigationTimeout(120000);       // default was 30000
 
         await page.goto(`${fullUrl}`, { waitUntil: 'networkidle2' });  //networkidle0 || domcontentloaded
 

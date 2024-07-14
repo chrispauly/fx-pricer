@@ -14,6 +14,7 @@ async function scrapeAll(cluster, searchTerm, storeNames) {
     }
     catch (err) {
       console.log(`${item.name} scrapeAll error => `, err);
+      productResults.push({ name: item.name, imglink: item.imglink, error: err });
     }
   }));
 

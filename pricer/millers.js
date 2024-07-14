@@ -7,9 +7,10 @@ const picknsave = {
         const city = data.city;
         const zip = data.zip;
 		console.log(`Navigating to ${baseUrl}${city}...`);
+        page.setDefaultNavigationTimeout(120000);       // default was 30000
 
         await page.goto(`${baseUrl}${city}`, { waitUntil: 'networkidle2' });  //networkidle0 || domcontentloaded
-         
+
         await page.waitForSelector('.fp-btn-mystore');  
         await page.click('.fp-btn-mystore');
         

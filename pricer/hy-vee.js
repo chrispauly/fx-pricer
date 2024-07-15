@@ -1,3 +1,5 @@
+let sessionManager = require("./sessionManager");
+
 const hyvee = {
 	async scraper({page, data}) {
         const baseUrl = 'https://www.hy-vee.com/';
@@ -54,6 +56,7 @@ const hyvee = {
             return prodElements;
 	    });
 
+        await sessionManager.saveSession(page, 'hyvee', city, zip);
         return products;
     }
 }

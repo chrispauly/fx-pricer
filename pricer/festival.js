@@ -1,3 +1,4 @@
+let sessionManager = require("./sessionManager");
 let scrollToBottom = require("scroll-to-bottomjs");
 
 const festival = {
@@ -18,6 +19,7 @@ const festival = {
         await page.click('.fp-btn-mystore');
         console.log(`Festival: Clicked mystore button...`);
 
+        // Jump here on restored session
         await page.waitForSelector('.search');
         await page.hover('.search');
         await page.click('.search');
@@ -33,6 +35,9 @@ const festival = {
         console.log(`Festival: Scrolling to bottom to lazy load images...`);
         await page.evaluate(scrollToBottom);
         
+        console.log(`Festival: Pausing for 2 seconds to lazy load images...`);
+        await new Promise(r => setTimeout(r, 2000));
+
 // if fp-result-list does not return, means no results for search term
 
         console.log(`Festival: Sending eval to browser to load products...`);
@@ -67,6 +72,7 @@ const festival = {
             return prodElements;
 	    });
 
+        await sessionManager.saveSession(page, 'festival', city, zip);
         return products;
     }
 }

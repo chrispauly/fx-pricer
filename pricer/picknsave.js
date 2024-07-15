@@ -1,3 +1,5 @@
+let sessionManager = require("./sessionManager");
+
 const picknsave = {
 	async scraper({page, data}){
         const baseUrl = 'https://www.picknsave.com/search';
@@ -52,6 +54,7 @@ const picknsave = {
             return prodElements;
 	    });
 
+        await sessionManager.saveSession(page, 'picknsave', city, zip);
         return products;
     }
 }

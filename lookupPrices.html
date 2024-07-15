@@ -96,21 +96,27 @@
                 `;
                 storeDiv.appendChild(leftSection);
 
-                // Create the right section with products
+                // Create section with products or error
                 const productsSection = document.createElement('div');
                 productsSection.className = 'products';
-                let count = 1;
-                for(const product of store.products) {
-                    const productDiv = document.createElement('div');
-                    productDiv.className = 'product';
-                    productDiv.innerHTML = `
-                        <h3>${product.name}</h3>
-                        <p><strong>Price:</strong> ${product.price}</p>
-                        <p><strong>Sale:</strong> ${product.sale ? product.sale : 'N/A'}</p>
-                        <p><strong>Size:</strong> ${product.size}</p>
-                    `;
-                    productsSection.appendChild(productDiv);
-                    //if(++count>5) break;
+
+                if(store.error) {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'error';
+                    errorDiv.innerHTML = store.error;
+                    productsSection.appendChild(errorDiv);
+                } else {
+                    for(const product of store.products) {
+                        const productDiv = document.createElement('div');
+                        productDiv.className = 'product';
+                        productDiv.innerHTML = `
+                            <h3>${product.name}</h3>
+                            <p><strong>Price:</strong> ${product.price}</p>
+                            <p><strong>Sale:</strong> ${product.sale ? product.sale : 'N/A'}</p>
+                            <p><strong>Size:</strong> ${product.size}</p>
+                        `;
+                        productsSection.appendChild(productDiv);
+                    }
                 }
 
                 storeDiv.appendChild(productsSection);

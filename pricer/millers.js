@@ -1,6 +1,7 @@
+let sessionManager = require("./sessionManager");
 let scrollToBottom = require("scroll-to-bottomjs");
 
-const picknsave = {
+const millers = {
 	async scraper({page, data}){
         const baseUrl = 'https://www.millerandsonssupermarket.com/stores/';
         const searchTerm = data.searchTerm;
@@ -62,8 +63,9 @@ const picknsave = {
             return prodElements;
 	    });
 
+        await sessionManager.saveSession(page, 'millrs', city, zip);
         return products;
     }
 }
 
-module.exports = picknsave; 
+module.exports = millers; 

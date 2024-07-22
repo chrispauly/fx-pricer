@@ -63,7 +63,7 @@ module.exports = async function (context, req) {
         context.res = {
           body: storesBody,
           headers: {
-              "content-type": "text/html"
+            "content-type": "text/html"
           }
       };
     }

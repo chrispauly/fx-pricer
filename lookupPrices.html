@@ -69,13 +69,21 @@
             padding: 10px;
             box-sizing: border-box;
         }
+        .strikethrough {
+            text-decoration: line-through;
+            color: red;
+        }
+        .sale {
+            color: green;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
     <input type="text" id="inputBox" placeholder="Enter grocery item">
     <button id="searchButton">Find prices</button>
-    <div id="spinner">Finding prices...</div>
+    <div id="spinner">Finding prices... <span id="counter"></span></div>
     <div id="productContainer" class="container"></div>
     <script>
         // Function to display the data
@@ -103,16 +111,21 @@
                 if(store.error) {
                     const errorDiv = document.createElement('div');
                     errorDiv.className = 'error';
-                    errorDiv.innerHTML = store.error;
+                    errorDiv.innerHTML = `An error occurred: ${store.error.name ?? ''}`;
                     productsSection.appendChild(errorDiv);
                 } else {
                     for(const product of store.products) {
                         const productDiv = document.createElement('div');
                         productDiv.className = 'product';
+
+                        let price =  product.price;
+                        if (product.sale) {
+                            price = `<span class="strikethrough">${product.price}</span> <span class="sale">${product.sale}</span>`;
+                        } 
+
                         productDiv.innerHTML = `
                             <h3>${product.name}</h3>
-                            <p><strong>Price:</strong> ${product.price}</p>
-                            <p><strong>Sale:</strong> ${product.sale ? product.sale : 'N/A'}</p>
+                            <p><strong>Price:</strong> ${price}</p>
                             <p><strong>Size:</strong> ${product.size}</p>
                         `;
                         productsSection.appendChild(productDiv);
@@ -134,7 +147,7 @@
 
         async function doPriceLookup(store, searchTerm) {
             try {
-                const response = await fetch(`https://fx-pricer.azurewebsites.net/api/pricer?store=${store}&search=${encodeURIComponent(searchTerm)}`);
+                const response = await fetch(`http://localhost:7071/api/pricer?store=${store}&search=${encodeURIComponent(searchTerm)}`); //,{ mode: 'no-cors' });
                 const data = await response.json();
                 console.log(`${store} fetch completed`);
                 displayData(data);
@@ -151,6 +164,18 @@
 
         // Function to handle search
         async function handleSearch() {
+
+            // Counter 
+            let counter = 1;
+            const counterElement = document.getElementById('counter');
+            counterElement.textContent = '';
+
+            // Function to update the counter every second
+            const counterInterval = setInterval(() => {
+                counter++;
+                counterElement.textContent = counter;
+            }, 1000);
+
             const query = inputBox.value.trim();
             if (!query) return;
 
@@ -160,8 +185,8 @@
             try {
 
                 // Create an array of fetch promises
-                //const fetchPromises = ['Festival-Verona','PickNSave','Woodmans-West','Hy-Vee','Millers-Verona']
-                const fetchPromises = ['Festival-Verona','PickNSave','Millers-Verona','Woodmans-West','Hy-Vee']
+                const fetchPromises = ['Festival-Verona','PickNSave','Woodmans-West','Hy-Vee','Millers-Verona']
+                //const fetchPromises = ['Festival-Verona']
                     .map(store => doPriceLookup(store, query));
 
                 // Wait for all fetch promises to settle
@@ -175,6 +200,8 @@
                 
                 spinner.style.display = 'none';
                 productContainerDiv.innerHTML = 'An error occurred. Please try again.';
+            } finally {
+                clearInterval(counterInterval);
             }
         }
 

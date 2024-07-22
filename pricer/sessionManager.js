@@ -1,6 +1,8 @@
 const fs = require('fs');
+const {join,normalize} = require('path');
 
 async function saveSession(page, store, city, zip) {
+  console.log('saveSession is under construction'); return;
   const session = await page.target().createCDPSession();
   const resp = await session.send('Network.getAllCookies');
   await session.detach();
@@ -22,6 +24,7 @@ async function saveSession(page, store, city, zip) {
 }
 
 async function restoreSession(page, store, city, zip) {
+  console.log('restoreSession is under construction'); return;
   const sessionFilePath = buildSessionFilename(store, city, zip);
   if (!fs.existsSync(sessionFilePath)) {
     console.error(`Session file ${sessionFilePath} does not exist.`);
@@ -47,7 +50,7 @@ async function restoreSession(page, store, city, zip) {
 }
 
 function buildSessionFilename(store, city, zip) {
-    return `./.cache/${store}.${city}.${zip}.json`;
+    return normalize(join(__dirname, '..', '.cache') + `/${store}.${city}.${zip}.json`);
 }
 
 module.exports = {

@@ -68,6 +68,19 @@
             border: 1px solid #ccc;
             padding: 10px;
             box-sizing: border-box;
+            position: relative;
+        }
+        .white-background {
+            background: rgba(255, 255, 255, 0.5);
+        }
+        .product img {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 75px;
+            height: auto;
+            opacity: 1;
+            z-index: -1;
         }
         .strikethrough {
             text-decoration: line-through;
@@ -82,10 +95,19 @@
 <body>
 
     <input type="text" id="inputBox" placeholder="Enter grocery item">
+    <div id="stores-container">
+        <label><input type="checkbox" value="PickNSave"> Pick N Save</label>
+        <label><input type="checkbox" value="Woodmans-West"> Woodman's West</label>
+        <label><input type="checkbox" value="Hy-Vee"> Hy-Vee</label>
+        <label><input type="checkbox" value="Millers-Verona"> Miller's Verona</label>
+        <label><input type="checkbox" value="Festival-Verona"> Festival Verona</label>
+    </div>
     <button id="searchButton">Find prices</button>
     <div id="spinner">Finding prices... <span id="counter"></span></div>
     <div id="productContainer" class="container"></div>
     <script>
+        let selectedOptions = [];
+
         // Function to display the data
         function displayData(data) {
             const container = document.getElementById('productContainer');
@@ -126,8 +148,13 @@
                         productDiv.innerHTML = `
                             <h3>${product.name}</h3>
                             <p><strong>Price:</strong> ${price}</p>
-                            <p><strong>Size:</strong> ${product.size}</p>
+                            <p class="/*white-background*/"><strong>Size:</strong> ${product.size}</p>
                         `;
+
+                        if(product.img) {
+                            productDiv.innerHTML += `<img src="${product.img}" alt="${product.name}">`;
+                        }
+
                         productsSection.appendChild(productDiv);
                     }
                 }
@@ -165,8 +192,10 @@
         // Function to handle search
         async function handleSearch() {
 
+            if(selectedOptions.length === 0) return;
+            
             // Counter 
-            let counter = 1;
+            let counter = 0;
             const counterElement = document.getElementById('counter');
             counterElement.textContent = '';
 
@@ -183,11 +212,8 @@
             spinner.style.display = 'block';
 
             try {
-
-                // Create an array of fetch promises
-                const fetchPromises = ['Festival-Verona','PickNSave','Woodmans-West','Hy-Vee','Millers-Verona']
-                //const fetchPromises = ['Festival-Verona']
-                    .map(store => doPriceLookup(store, query));
+                
+                const fetchPromises = selectedOptions.map(store => doPriceLookup(store, query));
 
                 // Wait for all fetch promises to settle
                 const results = await Promise.allSettled(fetchPromises);
@@ -213,6 +239,19 @@
             if (event.key === 'Enter') {
                 handleSearch();
             }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const checkboxContainer = document.getElementById('stores-container');
+            checkboxContainer.addEventListener('change', (event) => {
+                const checkbox = event.target;
+                if (checkbox.checked) {
+                    selectedOptions.push(checkbox.value);
+                } else {
+                    selectedOptions = selectedOptions.filter(option => option !== checkbox.value);
+                }
+                console.log(selectedOptions);  // Debugging: Check the selected options
+            });
         });
     </script>
 

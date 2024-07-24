@@ -1,6 +1,8 @@
 const {saveFile, getFile} = require('./fsLocal');
 
 async function saveSession(page, store, city, zip) {
+  if(notLocal()) { console.log('saveSession not working in the cloud...'); return; }
+
   const session = await page.target().createCDPSession();
   const resp = await session.send('Network.getAllCookies');
   await session.detach();
@@ -23,7 +25,9 @@ async function saveSession(page, store, city, zip) {
 }
 
 async function restoreSession(page, store, city, zip) {
-  const sessionData = fileManager.getFile(store, city, zip);
+  if(notLocal()) { console.log('restoreSession not working in the cloud...'); return; }
+
+  const sessionData = getFile(store, city, zip);
   if(!sessionData) return;
 
   const { cookies, localStorageData } = sessionData;
@@ -41,6 +45,10 @@ async function restoreSession(page, store, city, zip) {
     } catch(err) { console.log(`restoreSession localstorage error: ${err}`); }  
   }, localStorageData);
   return true;
+}
+
+function notLocal() {
+  return process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.WEBSITE_INSTANCE_ID || true;
 }
 
 module.exports = {

@@ -34,6 +34,8 @@ const woodmans = {
             } else {
                 console.error(`Woodmans: Instore button not found...`);
             }
+        } else {
+            console.log(`Woodmans: Session restored...`);
         }
 
         // Jump here on session restore

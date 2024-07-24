@@ -7,7 +7,6 @@
         "test": "echo \"No tests yet...\""
     },
     "dependencies": {
-        "puppeteer": "^22.13.0",
         "puppeteer-cluster": "^0.24.0",
         "puppeteer-extra": "^3.3.6",
         "puppeteer-extra-plugin-adblocker": "^2.13.6",

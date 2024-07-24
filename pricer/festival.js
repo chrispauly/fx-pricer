@@ -10,14 +10,19 @@ const festival = {
 
 		console.log(`Festival: Navigating to ${baseUrl}${city}...`);
         page.setDefaultNavigationTimeout(120000);       // default was 30000
+        const restoredSession = await sessionManager.restoreSession(page, 'festival', city, zip);
 
         await page.goto(`${baseUrl}${city}`, { waitUntil: 'networkidle2' });  //networkidle0 || domcontentloaded
         console.log(`Festival: Waiting for mystore button to load...`);
 
-        await page.waitForSelector('.fp-btn-mystore');  // Festival foods slow loads this button
-        await page.hover('.fp-btn-mystore');
-        await page.click('.fp-btn-mystore');
-        console.log(`Festival: Clicked mystore button...`);
+        if(!restoredSession) {
+            await page.waitForSelector('.fp-btn-mystore');  // Festival foods slow loads this button
+            await page.hover('.fp-btn-mystore');
+            await page.click('.fp-btn-mystore');
+            console.log(`Festival: Clicked mystore button...`);
+        } else {
+            console.log(`Festival: Session restored...`);
+        }
 
         // Jump here on restored session
         await page.waitForSelector('.search');

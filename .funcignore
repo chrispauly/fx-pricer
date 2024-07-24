@@ -4,3 +4,5 @@
 local.settings.json
 test
 node_modules
+win64*
+lambda*

@@ -1,8 +1,8 @@
-const fs = require('fs');
-const {join,normalize} = require('path');
+const {saveFile, getFile} = require('./fsLocal');
 
 async function saveSession(page, store, city, zip) {
-  console.log('saveSession is under construction'); return;
+  if(notLocal()) { console.log('saveSession not working in the cloud...'); return; }
+
   const session = await page.target().createCDPSession();
   const resp = await session.send('Network.getAllCookies');
   await session.detach();
@@ -19,19 +19,17 @@ async function saveSession(page, store, city, zip) {
     return data;
   });
   const sessionData = { cookies, localStorageData };
-  const sessionFilePath = buildSessionFilename(store, city, zip);
-  fs.writeFileSync(sessionFilePath, JSON.stringify(sessionData, null, 2));
+
+  // Save off data
+  saveFile(store, city, zip, sessionData);
 }
 
 async function restoreSession(page, store, city, zip) {
-  console.log('restoreSession is under construction'); return;
-  const sessionFilePath = buildSessionFilename(store, city, zip);
-  if (!fs.existsSync(sessionFilePath)) {
-    console.error(`Session file ${sessionFilePath} does not exist.`);
-    return false;
-  }
+  if(notLocal()) { console.log('restoreSession not working in the cloud...'); return; }
 
-  const sessionData = JSON.parse(fs.readFileSync(sessionFilePath, 'utf8'));
+  const sessionData = getFile(store, city, zip);
+  if(!sessionData) return;
+
   const { cookies, localStorageData } = sessionData;
   const session = await page.target().createCDPSession();
   await session.send('Network.setCookies', {
@@ -49,8 +47,8 @@ async function restoreSession(page, store, city, zip) {
   return true;
 }
 
-function buildSessionFilename(store, city, zip) {
-    return normalize(join(__dirname, '..', '.cache') + `/${store}.${city}.${zip}.json`);
+function notLocal() {
+  return process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.WEBSITE_INSTANCE_ID || true;
 }
 
 module.exports = {

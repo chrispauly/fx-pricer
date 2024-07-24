@@ -32,21 +32,37 @@ const picknsave = {
                 const productOriginalPriceElement = item.querySelector('s.kds-Price-original');
                 const productSizeElement = item.querySelector('[data-testid="cart-page-item-sizing"]');
                 const productImgElement = item.querySelector('.kds-Image-img');
+                const productCouponElement = item.querySelector('[data-testid="savings-zone-coupon-text"]');
+                const manyCouponsElement = item.querySelector('[data-testid="open-coupon-modal-button"]');
+
+                const aboutElement = item.querySelector('.kds-Price-relativePrefix');
 
                 if (productNameElement && productUnitPriceElement) {
                     const productName = productNameElement.innerText.trim();
                     const productPrice = productOriginalPriceElement ? productOriginalPriceElement.innerText.trim().replace('$','') 
-                                                       :  productUnitPriceElement.value.trim();
+                                                                     :  productUnitPriceElement.value.trim();
                     const productSale = productOriginalPriceElement ? productUnitPriceElement.value.trim() : null;
-                    const productSize = productSizeElement ? productSizeElement.innerText.trim() : null;
-                    
+                    const productSize = productSizeElement ? productSizeElement.innerText.replace(" |", "")
+                                                                                         .replace("NET WT","")
+                                                                                         .trim()
+                                                                                         : null;
+                    const imgSrc = productImgElement && productImgElement.src ? productImgElement.src.trim() : null;
+
+                    const manyCoupons = manyCouponsElement && !/View Offer/.test(manyCouponsElement.innerText) ? ` (more offers available)` : '';
+                    const couponText =  productCouponElement ? `${productCouponElement.innerText.trim()}${manyCoupons}` : null;
+
+                    // Deal with produce aboutElement
+                    const producePrice = aboutElement ? productSize.split("/")[0].replace("$","").trim() : null;
+                    const produceSize = aboutElement ? productSize.split("/")[1].trim() : null;
+
                     // Add the product data to the array
                     prodElements.push({
                         name: productName,
-                        price: productPrice,
+                        price: producePrice ?? productPrice,
                         sale: productSale,
-                        size: productSize,
-                        //img: imgSrc,
+                        size: produceSize ?? productSize,
+                        coupon: couponText,
+                        img: imgSrc,
                     });
                 }
             });

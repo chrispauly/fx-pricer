@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lookup Prices</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: auto;
+        }
+        #inputBox {
+            width: 50%;
+            padding: 10px;
+            font-size: 20px;
+        }
+        #searchButton {
+            margin-top: 10px;
+            padding: 8px 14px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        #results {
+            margin-top: 20px;
+            width: 90%;
+            text-align: center;
+        }
+        #spinner {
+            display: none;
+            margin-top: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+        }
+        .store {
+            width: 100%;
+            display: block;
+            clear: both;
+            margin-bottom: 20px;
+        }
+        .left {
+            text-align: center;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .left img {
+            width: 100%;
+            max-width: 200px;
+            /* Set a reasonable max-width to prevent overly large images */
+        }
+        .products {
+            display: flex;
+            overflow-x: auto;
+        }
+        .product {
+            min-width: 200px;
+            margin-right: 15px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            box-sizing: border-box;
+            position: relative;
+        }
+        .white-background {
+            background: rgba(255, 255, 255, 0.5);
+        }
+        .product img {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 75px;
+            height: auto;
+            opacity: 1;
+            z-index: -1;
+        }
+        .strikethrough {
+            text-decoration: line-through;
+            color: red;
+        }
+        .sale {
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <input type="text" id="inputBox" placeholder="Enter grocery item">
+    <div id="stores-container">
+        <label><input type="checkbox" value="PickNSave"> Pick N Save</label>
+        <label><input type="checkbox" value="Woodmans-West"> Woodman's West</label>
+        <label><input type="checkbox" value="Hy-Vee"> Hy-Vee</label>
+        <label><input type="checkbox" value="Millers-Verona"> Miller's Verona</label>
+        <label><input type="checkbox" value="Festival-Verona"> Festival Verona</label>
+    </div>
+    <button id="searchButton">Find prices</button>
+    <div id="spinner">Finding prices... <span id="counter"></span></div>
+    <div id="productContainer" class="container"></div>
+    <script>
+        let selectedOptions = [];
+
+        // Function to display the data
+        function displayData(data) {
+            const container = document.getElementById('productContainer');
+
+            data.forEach(store => {
+            // Create the left section with name and image
+                const storeDiv = document.createElement('div');
+                storeDiv.className = 'store';
+                container.appendChild(storeDiv);
+
+                const leftSection = document.createElement('div');
+                leftSection.className = 'left';
+                leftSection.innerHTML = `
+                    <h2>${store.name}</h2>
+                    <img src="${store.imglink}" alt="${store.name}">
+                `;
+                storeDiv.appendChild(leftSection);
+
+                // Create section with products or error
+                const productsSection = document.createElement('div');
+                productsSection.className = 'products';
+
+                if(store.error) {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'error';
+                    errorDiv.innerHTML = `An error occurred: ${store.error.name ?? ''}`;
+                    productsSection.appendChild(errorDiv);
+                } else {
+                    for(const product of store.products) {
+                        const productDiv = document.createElement('div');
+                        productDiv.className = 'product';
+
+                        let price =  product.price;
+                        if (product.sale) {
+                            price = `<span class="strikethrough">${product.price}</span> <span class="sale">${product.sale}</span>`;
+                        } 
+
+                        productDiv.innerHTML = `
+                            <h3>${product.name}</h3>
+                            <p><strong>Price:</strong> ${price}</p>
+                            <p class="/*white-background*/"><strong>Size:</strong> ${product.size}</p>
+                        `;
+
+                        if(product.img) {
+                            productDiv.innerHTML += `<img src="${product.img}" alt="${product.name}">`;
+                        }
+
+                        productsSection.appendChild(productDiv);
+                    }
+                }
+
+                storeDiv.appendChild(productsSection);
+            });
+        }
+
+        function displayError(error) {
+            const container = document.getElementById('productContainer');
+
+            const leftSection = document.createElement('div');
+            leftSection.className = 'left';
+            leftSection.innerHTML = JSON.stringify(error);
+            container.appendChild(leftSection);
+        }
+
+        async function doPriceLookup(store, searchTerm) {
+            try {
+                const response = await fetch(`https://fx-pricer.azurewebsites.net/api/pricer?store=${store}&search=${encodeURIComponent(searchTerm)}`); //,{ mode: 'no-cors' });
+                const data = await response.json();
+                console.log(`${store} fetch completed`);
+                displayData(data);
+            } catch(error) {
+                console.log(`${store} fetch errored`);
+                displayError(`${store}: ${error.message}`);
+            }
+        }
+
+        const inputBox = document.getElementById('inputBox');
+        const searchButton = document.getElementById('searchButton');
+        const productContainerDiv = document.getElementById('productContainer');
+        const spinner = document.getElementById('spinner');
+
+        // Function to handle search
+        async function handleSearch() {
+
+            if(selectedOptions.length === 0) return;
+            
+            // Counter 
+            let counter = 0;
+            const counterElement = document.getElementById('counter');
+            counterElement.textContent = '';
+
+            const query = inputBox.value.trim();
+            if (!query) return;
+
+            productContainerDiv.innerHTML = '';
+            spinner.style.display = 'block';
+            searchButton.disabled = true;
+
+            // Function to update the counter every second
+            const counterInterval = setInterval(() => {
+                                        counter++;
+                                        counterElement.textContent = counter;
+                                    }, 1000);
+
+            // Send fetches to any selected stores
+            try {
+                
+                const fetchPromises = selectedOptions.map(store => doPriceLookup(store, query));
+                
+                // Wait for all fetch promises to settle
+                const results = await Promise.allSettled(fetchPromises);
+
+                results.forEach(p => {
+                    console.log(p.status);
+                });
+
+            } catch (error) {
+
+                productContainerDiv.innerHTML = 'An error occurred. Please try again.';
+
+            } finally {
+
+                spinner.style.display = 'none';
+                clearInterval(counterInterval);
+                searchButton.disabled = false;
+            }
+        }
+
+        // Add event listener for the button
+        searchButton.addEventListener('click', handleSearch);
+
+        // Add event listener for Enter key press
+        inputBox.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                handleSearch();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const checkboxContainer = document.getElementById('stores-container');
+
+            // Initialize the array with pre-selected checkboxes
+            const checkboxes = checkboxContainer.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => { if (checkbox.checked) { checkedValues.push(checkbox.value); } });
+
+            checkboxContainer.addEventListener('change', (event) => {
+                const checkbox = event.target;
+                if (checkbox.checked) {
+                    selectedOptions.push(checkbox.value);
+                } else {
+                    selectedOptions = selectedOptions.filter(option => option !== checkbox.value);
+                }
+                console.log(selectedOptions);  // Debugging: Check the selected options
+            });
+        });
+    </script>
+
+</body>
+</html>

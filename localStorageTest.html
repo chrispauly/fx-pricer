@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Save and Load JSON Data</title>
+    <style>
+        .hidden { display: none; }
+        .collapsed { display: none; }
+        .entry { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
+        .header { display: flex; justify-content: space-between; align-items: center; }
+        .details { margin-left: 20px; }
+        .delete-button { cursor: pointer; color: red; }
+    </style>
+</head>
+<body>
+    <input type="text" id="searchTerm" placeholder="Enter search term">
+    <button id="searchButton">Fetch Data</button>
+    <div id="dataContainer"></div>
+    <button id="toggleButton">Show/Hide Saved Data</button>
+    <div id="savedDataContainer" class="collapsed"></div>
+
+    <script src="lstest.js"></script>
+</body>
+</html>
